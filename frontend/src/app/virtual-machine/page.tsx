@@ -1,8 +1,34 @@
-import { Badge, Box, Button, Flex, Table, Text } from '@radix-ui/themes';
-import { TrashIcon } from '@radix-ui/react-icons';
+'use client';
+
+import { Box, Flex, Text } from '@radix-ui/themes';
 import ModalCreate from '@/views/virtualMachine/ModalCreate';
+import TableVM from '@/views/virtualMachine/TableVM';
+import io from 'socket.io-client';
+import { useEffect, useState } from 'react';
+
+const socket = io('http://localhost:4000');
 
 export default function VirtualMachinePage() {
+  const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState('idle');
+
+  const startProcess = async () => {
+    setStatus('running');
+    await fetch('http://localhost:4000/start-process', { method: 'POST' });
+  };
+
+  useEffect(() => {
+    socket.on('process:start', () => setStatus('running'));
+    socket.on('process:update', (data) => setProgress(data.progress));
+    socket.on('process:done', () => setStatus('done'));
+
+    return () => {
+      socket.off('process:start');
+      socket.off('process:update');
+      socket.off('process:done');
+    };
+  }, []);
+
   return (
     <main>
       <Flex direction='column' gap='4'>
@@ -13,47 +39,31 @@ export default function VirtualMachinePage() {
           <ModalCreate />
         </Flex>
         <Box>
-          <Table.Root variant='surface'>
-            <Table.Header>
-              <Table.Row>
-                <Table.ColumnHeaderCell>NAME</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>STATUS</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>PACKAGE</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>IP ADDRESS</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
-              </Table.Row>
-            </Table.Header>
-
-            <Table.Body>
-              <Table.Row>
-                <Table.RowHeaderCell>VirtualMachine-01</Table.RowHeaderCell>
-                <Table.Cell>
-                  <Badge color='green'>Running</Badge>
-                </Table.Cell>
-                <Table.Cell>vps-medium-m1</Table.Cell>
-                <Table.Cell>130.59.192.10 (Private)</Table.Cell>
-                <Table.Cell width='60px'>
-                  <Button variant='soft' color='red'>
-                    <TrashIcon />
-                  </Button>
-                </Table.Cell>
-              </Table.Row>
-
-              <Table.Row>
-                <Table.RowHeaderCell>VirtualMachine-02</Table.RowHeaderCell>
-                <Table.Cell>
-                  <Badge color='green'>Running</Badge>
-                </Table.Cell>
-                <Table.Cell>vps-small-m1</Table.Cell>
-                <Table.Cell>130.59.192.10 (Private)</Table.Cell>
-                <Table.Cell width='60px'>
-                  <Button variant='soft' color='red'>
-                    <TrashIcon />
-                  </Button>
-                </Table.Cell>
-              </Table.Row>
-            </Table.Body>
-          </Table.Root>
+          <button onClick={startProcess} disabled={status === 'running'}>
+            {status === 'running' ? 'Processing...' : 'Start Process'}
+          </button>
+          <div
+            style={{
+              marginTop: 20,
+              width: '100%',
+              height: 20,
+              background: '#eee',
+              borderRadius: 10,
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                height: '100%',
+                width: `${progress}%`,
+                background: 'green',
+                transition: 'width 0.3s ease',
+              }}
+            />
+          </div>
+          <p>Status: {status}</p>
+          <p>Progress: {progress}%</p>
+          <TableVM />
         </Box>
       </Flex>
     </main>

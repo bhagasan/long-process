@@ -8,7 +8,7 @@ const Sidebar = () => {
       <Card variant='surface' className='h-full'>
         <div className='py-4 border-b'>
           <Text as='div' size='4' weight='bold'>
-            My Dashboard
+            Cloud Service App
           </Text>
         </div>
         <nav className='flex-1 py-2 space-y-1'>

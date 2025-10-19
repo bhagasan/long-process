@@ -1,7 +1,8 @@
 import { Badge, Box, Button, Flex, Table, Text } from '@radix-ui/themes';
-import { PlusIcon, TrashIcon } from '@radix-ui/react-icons';
+import { TrashIcon } from '@radix-ui/react-icons';
+import ModalCreate from '@/views/virtualMachine/ModalCreate';
 
-export default function Home() {
+export default function VirtualMachinePage() {
   return (
     <main>
       <Flex direction='column' gap='4'>
@@ -9,10 +10,7 @@ export default function Home() {
           <Text as='div' size='6' weight='bold'>
             Virtual Machine
           </Text>
-          <Button variant='outline' size='1'>
-            Create
-            <PlusIcon />
-          </Button>
+          <ModalCreate />
         </Flex>
         <Box>
           <Table.Root variant='surface'>

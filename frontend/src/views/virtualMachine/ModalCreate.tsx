@@ -1,22 +1,63 @@
+'use client';
 import { PlusIcon } from '@radix-ui/react-icons';
-import { AlertDialog, Box, Button, Flex, Select, Text, TextField } from '@radix-ui/themes';
-import React from 'react';
+import { Dialog, Box, Button, Flex, Select, Text, TextField } from '@radix-ui/themes';
+import React, { useEffect, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+
+type PayloadTypes = {
+  location: string;
+  dc: string;
+  hostname: string;
+  password: string;
+};
 
 const ModalCreate = () => {
+  const [open, setOpen] = useState<boolean>(false);
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isValid },
+  } = useForm<PayloadTypes>({
+    defaultValues: {
+      location: '',
+      dc: '',
+      hostname: '',
+      password: '',
+    },
+    mode: 'onChange',
+  });
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        password: '',
+        dc: '',
+        hostname: '',
+        location: '',
+      });
+    }
+  }, [open, reset]);
+
+  const onSubmit = (data: PayloadTypes) => console.log(data);
+
   return (
-    <AlertDialog.Root>
-      <AlertDialog.Trigger>
+    <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Trigger>
         <Button variant='outline' size='1'>
           Create
           <PlusIcon />
         </Button>
-      </AlertDialog.Trigger>
-      <AlertDialog.Content maxWidth='600px'>
-        <AlertDialog.Title>Create Virtual Machine</AlertDialog.Title>
-        <AlertDialog.Description size='2'>
+      </Dialog.Trigger>
+      <Dialog.Content
+        onInteractOutside={(event) => event.preventDefault()}
+        onEscapeKeyDown={(event) => event.preventDefault()}
+      >
+        <Dialog.Title>Create Virtual Machine</Dialog.Title>
+        <Dialog.Description size='2'>
           This process may take a few minutes. During this time, all actions related to the virtual machine are
           temporarily restricted.
-        </AlertDialog.Description>
+        </Dialog.Description>
 
         <Box my='4'>
           <Flex direction='column' gap='3'>
@@ -25,27 +66,41 @@ const ModalCreate = () => {
                 <Text as='div' size='2' mb='1' weight='bold'>
                   Location
                 </Text>
-                <Select.Root>
-                  <Select.Trigger placeholder='Select location' className='w-full' />
-                  <Select.Content>
-                    <Select.Item value='indonesia'>Indonesia</Select.Item>
-                    <Select.Item value='singapore' disabled>
-                      Singapore
-                    </Select.Item>
-                  </Select.Content>
-                </Select.Root>
+                <Controller
+                  control={control}
+                  name='location'
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select.Root onValueChange={field.onChange} value={field.value}>
+                      <Select.Trigger placeholder='Select location' className='w-full' />
+                      <Select.Content>
+                        <Select.Item value='indonesia'>Indonesia</Select.Item>
+                        <Select.Item value='singapore' disabled>
+                          Singapore
+                        </Select.Item>
+                      </Select.Content>
+                    </Select.Root>
+                  )}
+                />
               </Box>
               <Box width='100%'>
                 <Text as='div' size='2' mb='1' weight='bold'>
                   Data Center
                 </Text>
-                <Select.Root>
-                  <Select.Trigger placeholder='Select Data center' className='w-full' />
-                  <Select.Content>
-                    <Select.Item value='jkt-dc-1'>jkt-dc-1</Select.Item>
-                    <Select.Item value='jkt-dc-2'>jkt-dc-2</Select.Item>
-                  </Select.Content>
-                </Select.Root>
+                <Controller
+                  control={control}
+                  name='dc'
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select.Root onValueChange={field.onChange} value={field.value}>
+                      <Select.Trigger placeholder='Select Data center' className='w-full' />
+                      <Select.Content>
+                        <Select.Item value='jkt-dc-1'>jkt-dc-1</Select.Item>
+                        <Select.Item value='jkt-dc-2'>jkt-dc-2</Select.Item>
+                      </Select.Content>
+                    </Select.Root>
+                  )}
+                />
               </Box>
             </Flex>
             <Flex gap='3'>
@@ -53,30 +108,49 @@ const ModalCreate = () => {
                 <Text as='div' size='2' mb='1' weight='bold'>
                   Hostname
                 </Text>
-                <TextField.Root placeholder='Enter hostname' />
+                <Controller
+                  control={control}
+                  name='hostname'
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <TextField.Root onChange={field.onChange} value={field.value} placeholder='Enter hostname' />
+                  )}
+                />
               </Box>
               <Box width='100%'>
                 <Text as='div' size='2' mb='1' weight='bold'>
                   Password
                 </Text>
-                <TextField.Root type='password' placeholder='Enter root password' />
+                <Controller
+                  control={control}
+                  name='password'
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <TextField.Root
+                      onChange={field.onChange}
+                      value={field.value}
+                      type='password'
+                      placeholder='Enter root password'
+                    />
+                  )}
+                />
               </Box>
             </Flex>
           </Flex>
         </Box>
 
         <Flex gap='3' justify='end'>
-          <AlertDialog.Cancel>
+          <Dialog.Close>
             <Button variant='soft' color='gray'>
               Cancel
             </Button>
-          </AlertDialog.Cancel>
-          <AlertDialog.Action>
-            <Button>Submit</Button>
-          </AlertDialog.Action>
+          </Dialog.Close>
+          <Button onClick={handleSubmit(onSubmit)} disabled={!isValid}>
+            Submit
+          </Button>
         </Flex>
-      </AlertDialog.Content>
-    </AlertDialog.Root>
+      </Dialog.Content>
+    </Dialog.Root>
   );
 };
 

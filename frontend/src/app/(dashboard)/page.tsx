@@ -1,5 +1,4 @@
-import { Badge, Box, Button, Flex, Table, Text } from '@radix-ui/themes';
-import { PlusIcon, TrashIcon } from '@radix-ui/react-icons';
+import { Flex, Text } from '@radix-ui/themes';
 
 export default function Home() {
   return (

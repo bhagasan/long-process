@@ -6,19 +6,7 @@ import { Card, Flex, IconButton, Text } from '@radix-ui/themes';
 import React, { useEffect, useState } from 'react';
 
 const Topbar = () => {
-  const { socket, setProgress, progress } = useSocket();
-  const [status, setStatus] = useState('idle');
-  useEffect(() => {
-    socket.on('process:start', () => setStatus('running'));
-    socket.on('process:update', (data) => setProgress(data.progress));
-    socket.on('process:done', () => setStatus('done'));
-
-    return () => {
-      socket.off('process:start');
-      socket.off('process:update');
-      socket.off('process:done');
-    };
-  }, [setProgress, socket]);
+  const { progress } = useSocket();
 
   return (
     <div className='relative w-full'>
@@ -26,7 +14,7 @@ const Topbar = () => {
         <Card variant='surface' className='w-52 py-[8px]' size='1'>
           <Flex align='center' justify='between' width='100%' gapX='1'>
             <Text weight='medium' className='truncate'>
-              VirtualMachine-01sdsd
+              VirtualMachine-03
             </Text>
             <div className='w-6 flex-shrink-0'>
               <CircularProgress progress={progress > 100 ? 100 : progress} size={24} stroke={3} />

@@ -41,20 +41,22 @@ app.post('/vm-create', (req, res) => {
 
 // 🔹 Socket.io connection handler
 io.on('connection', (socket) => {
-  console.log('New connection:', socket.id);
+  console.log('Client connected:', socket.id);
 
-  // register the client’s ID so we can target them
   socket.on('register', (clientId) => {
     socket.join(clientId);
-    console.log(`Registered client: ${clientId}`);
-
-    // if they refresh the page, immediately send current progress
-    const savedProgress = clientProgress[clientId] || 0;
-    socket.emit('process:update', { progress: savedProgress });
+    console.log(`Client registered: ${clientId}`);
   });
 
-  socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
+  socket.on('getProgress', (clientId) => {
+    const progress = clientProgress[clientId] || 0;
+    console.log(`Sending last progress for ${clientId}:`, progress);
+
+    if (progress > 0 && progress < 100) {
+      socket.emit('process:start', { progress });
+    } else if (progress >= 100) {
+      socket.emit('process:done', { message: 'Process completed!' });
+    }
   });
 });
 

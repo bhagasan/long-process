@@ -5,6 +5,7 @@ import { io, Socket } from 'socket.io-client';
 type SocketContextValue = {
   socket: Socket;
   progress: number;
+  status: string;
   setProgress: React.Dispatch<React.SetStateAction<number>>;
 };
 
@@ -12,6 +13,7 @@ const SocketContext = createContext<SocketContextValue | null>(null);
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [progress, setProgress] = useState<number>(0);
+  const [status, setStatus] = useState('idle');
 
   // generate or reuse a client ID
   const clientId = useMemo(() => {
@@ -35,14 +37,25 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     socket.connect();
 
-    socket.emit('register', clientId); // tell server who we are
+    socket.emit('register', clientId);
 
     socket.on('connect', () => console.log('✅ Connected'));
     socket.on('disconnect', () => console.log('❌ Disconnected'));
 
-    socket.on('progress', (value: number) => setProgress(value));
+    socket.on('process:start', (data) => {
+      setStatus('running');
+      setProgress(data?.progress ?? 0);
+    });
 
-    // ask server for the last known progress
+    socket.on('process:update', (data) => {
+      setProgress(data.progress);
+    });
+
+    socket.on('process:done', () => {
+      setStatus('done');
+      setProgress(100);
+    });
+
     socket.emit('getProgress', clientId);
 
     return () => {
@@ -50,7 +63,19 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
   }, [socket, clientId]);
 
-  return <SocketContext.Provider value={{ socket, progress, setProgress }}>{children}</SocketContext.Provider>;
+  // useEffect(() => {
+  //   socket.on('process:start', () => setStatus('running'));
+  //   socket.on('process:update', (data) => setProgress(data.progress));
+  //   socket.on('process:done', () => setStatus('done'));
+
+  //   return () => {
+  //     socket.off('process:start');
+  //     socket.off('process:update');
+  //     socket.off('process:done');
+  //   };
+  // }, [setProgress, socket, status]);
+
+  return <SocketContext.Provider value={{ socket, progress, status, setProgress }}>{children}</SocketContext.Provider>;
 };
 
 export const useSocket = () => {

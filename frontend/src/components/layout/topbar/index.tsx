@@ -20,7 +20,6 @@ const Topbar = () => {
     };
   }, [setProgress, socket]);
 
-  console.log({ status });
   return (
     <div className='relative w-full'>
       <div className='fixed right-4 top-4 flex justify-end items-center gap-4'>
@@ -30,7 +29,7 @@ const Topbar = () => {
               VirtualMachine-01sdsd
             </Text>
             <div className='w-6 flex-shrink-0'>
-              <CircularProgress progress={progress} size={24} stroke={3} />
+              <CircularProgress progress={progress > 100 ? 100 : progress} size={24} stroke={3} />
             </div>
           </Flex>
         </Card>

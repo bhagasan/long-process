@@ -1,4 +1,5 @@
 'use client';
+import { useSocket } from '@/components/context/SocketProvider';
 import { PlusIcon } from '@radix-ui/react-icons';
 import { Dialog, Box, Button, Flex, Select, Text, TextField } from '@radix-ui/themes';
 import React, { useEffect, useState } from 'react';
@@ -12,6 +13,8 @@ type PayloadTypes = {
 };
 
 const ModalCreate = () => {
+  const { socket } = useSocket();
+  const clientId = localStorage.getItem('clientId');
   const [open, setOpen] = useState<boolean>(false);
   const {
     control,
@@ -28,9 +31,14 @@ const ModalCreate = () => {
     mode: 'onChange',
   });
 
-  const startProcess = async () => {
+  const startProcess = async (data: PayloadTypes) => {
     // setStatus('running');
-    await fetch('http://localhost:4000/vm-create', { method: 'POST' });
+    await fetch('http://localhost:4000/vm-create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, clientId }),
+    });
+    socket.emit('startProcess', clientId);
   };
 
   useEffect(() => {
@@ -45,7 +53,7 @@ const ModalCreate = () => {
   }, [open, reset]);
 
   const onSubmit = (data: PayloadTypes) => {
-    startProcess();
+    startProcess(data);
     setOpen(false);
   };
 

@@ -34,7 +34,7 @@ const CircularProgress = ({ progress = 75, size = 100, stroke = 8 }) => {
         />
       </svg>
       {/* overlay the text without rotation */}
-      <div className='absolute text-[10px]'>{progress}%</div>
+      {/* <div className='absolute text-[10px]'>{progress}%</div> */}
     </div>
   );
 };

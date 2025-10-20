@@ -28,6 +28,11 @@ const ModalCreate = () => {
     mode: 'onChange',
   });
 
+  const startProcess = async () => {
+    // setStatus('running');
+    await fetch('http://localhost:4000/vm-create', { method: 'POST' });
+  };
+
   useEffect(() => {
     if (open) {
       reset({
@@ -39,7 +44,10 @@ const ModalCreate = () => {
     }
   }, [open, reset]);
 
-  const onSubmit = (data: PayloadTypes) => console.log(data);
+  const onSubmit = (data: PayloadTypes) => {
+    startProcess();
+    setOpen(false);
+  };
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>

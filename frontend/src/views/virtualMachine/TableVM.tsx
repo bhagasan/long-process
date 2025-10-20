@@ -4,7 +4,7 @@ import React from 'react';
 
 const TableVM = () => {
   return (
-    <Table.Root variant='surface'>
+    <Table.Root variant='surface' mt='4'>
       <Table.Header>
         <Table.Row>
           <Table.ColumnHeaderCell>NAME</Table.ColumnHeaderCell>

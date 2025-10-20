@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Flex, Text } from '@radix-ui/themes';
+import { Box, Flex, Progress, Text } from '@radix-ui/themes';
 import ModalCreate from '@/views/virtualMachine/ModalCreate';
 import TableVM from '@/views/virtualMachine/TableVM';
 import io from 'socket.io-client';
@@ -42,25 +42,7 @@ export default function VirtualMachinePage() {
           <button onClick={startProcess} disabled={status === 'running'}>
             {status === 'running' ? 'Processing...' : 'Start Process'}
           </button>
-          <div
-            style={{
-              marginTop: 20,
-              width: '100%',
-              height: 20,
-              background: '#eee',
-              borderRadius: 10,
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              style={{
-                height: '100%',
-                width: `${progress}%`,
-                background: 'green',
-                transition: 'width 0.3s ease',
-              }}
-            />
-          </div>
+          <Progress value={progress} size='1' />
           <p>Status: {status}</p>
           <p>Progress: {progress}%</p>
           <TableVM />

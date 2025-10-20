@@ -16,9 +16,8 @@ app.use(express.json());
 // store progress per client
 const clientProgress = {}; // { [clientId]: progress }
 
-// 🔹 REST endpoint to start process
 app.post('/vm-create', (req, res) => {
-  const { clientId } = req.body; // client sends this from localStorage
+  const { clientId } = req.body;
   if (!clientId) return res.status(400).json({ error: 'Missing clientId' });
 
   let progress = clientProgress[clientId] || 0;

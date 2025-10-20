@@ -1,9 +1,9 @@
 'use client';
+import React from 'react';
 import { useSocket } from '@/components/context/SocketProvider';
 import CircularProgress from '@/components/shared/CircularProgress';
 import { BellIcon } from '@radix-ui/react-icons';
 import { Card, Flex, IconButton, Text } from '@radix-ui/themes';
-import React, { useEffect, useState } from 'react';
 
 const Topbar = () => {
   const { progress } = useSocket();

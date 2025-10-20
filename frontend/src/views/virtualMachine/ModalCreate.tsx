@@ -14,7 +14,7 @@ type PayloadTypes = {
 
 const ModalCreate = () => {
   const { socket } = useSocket();
-  const clientId = localStorage.getItem('clientId');
+  const clientId = typeof window !== 'undefined' ? localStorage.getItem('clientId') : null;
   const [open, setOpen] = useState<boolean>(false);
   const {
     control,

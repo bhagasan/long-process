@@ -17,12 +17,15 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // generate or reuse a client ID
   const clientId = useMemo(() => {
-    let id = localStorage.getItem('clientId');
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem('clientId', id);
+    if (typeof window !== 'undefined') {
+      let id = localStorage.getItem('clientId');
+      if (!id) {
+        id = crypto.randomUUID();
+        localStorage.setItem('clientId', id);
+      }
+      return id;
     }
-    return id;
+    return null;
   }, []);
 
   const socket = useMemo(

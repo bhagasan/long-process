@@ -44,7 +44,7 @@ const TableVM = () => {
             <Badge color='green'>Running</Badge>
           </Table.Cell>
           <Table.Cell>vps-medium-m1</Table.Cell>
-          <Table.Cell>130.59.192.10 (Private)</Table.Cell>
+          <Table.Cell>130.59.192.10</Table.Cell>
           <Table.Cell width='60px'>
             <IconButton variant='soft' color='red'>
               <TrashIcon />
@@ -58,7 +58,7 @@ const TableVM = () => {
             <Badge color='green'>Running</Badge>
           </Table.Cell>
           <Table.Cell>vps-small-m1</Table.Cell>
-          <Table.Cell>130.59.192.10 (Private)</Table.Cell>
+          <Table.Cell>130.59.192.10</Table.Cell>
           <Table.Cell width='60px'>
             <IconButton variant='soft' color='red'>
               <TrashIcon />

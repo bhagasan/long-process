@@ -6,6 +6,7 @@ type SocketContextValue = {
   socket: Socket;
   progress: number;
   status: string;
+  setStatus: React.Dispatch<React.SetStateAction<string>>;
   setProgress: React.Dispatch<React.SetStateAction<number>>;
 };
 
@@ -20,7 +21,8 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (typeof window !== 'undefined') {
       let id = localStorage.getItem('clientId');
       if (!id) {
-        id = crypto.randomUUID();
+        // id = crypto.randomUUID();
+        id = 'admin@admin.com';
         localStorage.setItem('clientId', id);
       }
       return id;
@@ -78,7 +80,11 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   //   };
   // }, [setProgress, socket, status]);
 
-  return <SocketContext.Provider value={{ socket, progress, status, setProgress }}>{children}</SocketContext.Provider>;
+  return (
+    <SocketContext.Provider value={{ socket, progress, status, setProgress, setStatus }}>
+      {children}
+    </SocketContext.Provider>
+  );
 };
 
 export const useSocket = () => {

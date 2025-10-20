@@ -10,6 +10,8 @@ type PayloadTypes = {
   dc: string;
   hostname: string;
   password: string;
+  package: string;
+  ip: string;
 };
 
 const ModalCreate = () => {
@@ -27,6 +29,8 @@ const ModalCreate = () => {
       dc: '',
       hostname: '',
       password: '',
+      package: '',
+      ip: '',
     },
     mode: 'onChange',
   });
@@ -113,6 +117,46 @@ const ModalCreate = () => {
                       <Select.Content>
                         <Select.Item value='jkt-dc-1'>jkt-dc-1</Select.Item>
                         <Select.Item value='jkt-dc-2'>jkt-dc-2</Select.Item>
+                      </Select.Content>
+                    </Select.Root>
+                  )}
+                />
+              </Box>
+            </Flex>
+            <Flex gap='3'>
+              <Box width='100%'>
+                <Text as='div' size='2' mb='1' weight='bold'>
+                  Package
+                </Text>
+                <Controller
+                  control={control}
+                  name='package'
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select.Root onValueChange={field.onChange} value={field.value}>
+                      <Select.Trigger placeholder='Select package' className='w-full' />
+                      <Select.Content>
+                        <Select.Item value='vps-medium-m1'>vps-medium-m1</Select.Item>
+                        <Select.Item value='vps-small-m1'>vps-small-m1</Select.Item>
+                      </Select.Content>
+                    </Select.Root>
+                  )}
+                />
+              </Box>
+              <Box width='100%'>
+                <Text as='div' size='2' mb='1' weight='bold'>
+                  IP Address
+                </Text>
+                <Controller
+                  control={control}
+                  name='ip'
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select.Root onValueChange={field.onChange} value={field.value}>
+                      <Select.Trigger placeholder='Select IP Address' className='w-full' />
+                      <Select.Content>
+                        <Select.Item value='192.168.10.2'>192.168.10.2</Select.Item>
+                        <Select.Item value='192.168.10.3'>192.168.10.3</Select.Item>
                       </Select.Content>
                     </Select.Root>
                   )}

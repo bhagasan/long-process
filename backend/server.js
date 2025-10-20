@@ -13,7 +13,7 @@ const io = new Server(server, {
 app.use(express.json());
 
 // REST endpoint to start process
-app.post('/start-process', (req, res) => {
+app.post('/vm-create', (req, res) => {
   let progress = 0;
   io.emit('process:start', { progress });
 

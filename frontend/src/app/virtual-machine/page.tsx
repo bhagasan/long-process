@@ -3,18 +3,17 @@
 import { Box, Flex, Progress, Text } from '@radix-ui/themes';
 import ModalCreate from '@/views/virtualMachine/ModalCreate';
 import TableVM from '@/views/virtualMachine/TableVM';
-import io from 'socket.io-client';
 import { useEffect, useState } from 'react';
-
-const socket = io('http://localhost:4000');
+import { useSocket } from '@/components/context/SocketProvider';
 
 export default function VirtualMachinePage() {
+  const socket = useSocket();
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState('idle');
 
   const startProcess = async () => {
     setStatus('running');
-    await fetch('http://localhost:4000/start-process', { method: 'POST' });
+    await fetch('http://localhost:4000/vm-create', { method: 'POST' });
   };
 
   useEffect(() => {
@@ -27,7 +26,7 @@ export default function VirtualMachinePage() {
       socket.off('process:update');
       socket.off('process:done');
     };
-  }, []);
+  }, [socket]);
 
   return (
     <main>

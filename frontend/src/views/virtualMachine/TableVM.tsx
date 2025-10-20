@@ -1,5 +1,5 @@
 import { TrashIcon } from '@radix-ui/react-icons';
-import { Badge, Button, Table } from '@radix-ui/themes';
+import { Badge, IconButton, Table } from '@radix-ui/themes';
 import React from 'react';
 
 const TableVM = () => {
@@ -24,9 +24,9 @@ const TableVM = () => {
           <Table.Cell>vps-medium-m1</Table.Cell>
           <Table.Cell>130.59.192.10 (Private)</Table.Cell>
           <Table.Cell width='60px'>
-            <Button variant='soft' color='red'>
+            <IconButton variant='soft' color='red'>
               <TrashIcon />
-            </Button>
+            </IconButton>
           </Table.Cell>
         </Table.Row>
 
@@ -38,9 +38,9 @@ const TableVM = () => {
           <Table.Cell>vps-small-m1</Table.Cell>
           <Table.Cell>130.59.192.10 (Private)</Table.Cell>
           <Table.Cell width='60px'>
-            <Button variant='soft' color='red'>
+            <IconButton variant='soft' color='red'>
               <TrashIcon />
-            </Button>
+            </IconButton>
           </Table.Cell>
         </Table.Row>
       </Table.Body>

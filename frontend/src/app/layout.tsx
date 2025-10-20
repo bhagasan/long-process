@@ -5,6 +5,8 @@ import '@radix-ui/themes/styles.css';
 import './globals.css';
 import BaseLayout from '@/components/layout';
 import Sidebar from '@/components/layout/sidebar';
+import { SocketProvider } from '@/components/context/SocketProvider';
+import Topbar from '@/components/layout/topbar';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,9 +19,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <Theme accentColor='purple' grayColor='sand' radius='large'>
-          <BaseLayout sidebar={<Sidebar />}>{children}</BaseLayout>
-        </Theme>
+        <SocketProvider>
+          <Theme accentColor='purple' grayColor='sand' radius='large'>
+            <BaseLayout sidebar={<Sidebar />} topbar={<Topbar />}>
+              {children}
+            </BaseLayout>
+          </Theme>
+        </SocketProvider>
       </body>
     </html>
   );

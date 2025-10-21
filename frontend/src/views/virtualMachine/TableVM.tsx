@@ -35,6 +35,7 @@ const TableVM = () => {
       socket.off('process:list');
     };
   }, [socket, clientId]);
+
   return (
     <Table.Root variant='surface' mt='4'>
       <Table.Header>
@@ -48,8 +49,8 @@ const TableVM = () => {
       </Table.Header>
 
       <Table.Body>
-        {dataQueue.progress >= 0 && dataQueue.progress < 100 && (
-          <Table.Row>
+        {Object.entries(dataQueue).map((_, idx: number) => (
+          <Table.Row key={`skeleton-${idx}`}>
             <Table.RowHeaderCell>
               <Skeleton height='28px' width='160px' />
             </Table.RowHeaderCell>
@@ -66,7 +67,7 @@ const TableVM = () => {
               <Skeleton height='28px' width='32px' />
             </Table.Cell>
           </Table.Row>
-        )}
+        ))}
         <Table.Row>
           <Table.RowHeaderCell>VirtualMachine-01</Table.RowHeaderCell>
           <Table.Cell>

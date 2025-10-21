@@ -25,8 +25,8 @@ const ModalCreate = () => {
     defaultValues: {
       location: '',
       dc: '',
-      hostname: 'testing-hostname',
-      password: 'P@ssw0rd',
+      hostname: '',
+      password: '',
       package: '',
       ip: '',
     },
@@ -34,7 +34,6 @@ const ModalCreate = () => {
   });
 
   const startProcess = async (data: PayloadTypes) => {
-    // setStatus('running');
     await fetch('http://localhost:4000/vm-create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -46,7 +45,6 @@ const ModalCreate = () => {
         itemLabel: data.hostname,
       }),
     });
-    // socket.emit('startProcess', clientId);
   };
 
   useEffect(() => {

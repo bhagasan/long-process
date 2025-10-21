@@ -1,12 +1,49 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSocket } from '@/components/context/SocketProvider';
 import CircularProgress from '@/components/shared/CircularProgress';
 import { BellIcon } from '@radix-ui/react-icons';
 import { Card, Flex, IconButton, Text } from '@radix-ui/themes';
 
 const Topbar = () => {
-  const { progress, status, setStatus, dataQueue } = useSocket();
+  const [dataQueue, setDataQueue] = useState<any>({});
+  const { socket, clientId } = useSocket();
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      socket.on('process:start', (data) => {
+        // const { progress, actionType, actionId, itemLabel } = data;
+        // console.log('start', { actionId, actionType, progress, itemLabel });
+        setDataQueue(data);
+      });
+
+      socket.on('process:update', (data) => {
+        // const { progress, actionType, actionId, itemLabel } = data;
+        // console.log('update', { actionId, actionType, progress, itemLabel });
+        setDataQueue(data);
+      });
+
+      socket.on('process:done', (data) => {
+        // const { actionType, actionId, message, itemLabel } = data;
+        // console.log('done', { actionId, actionType, itemLabel, message });
+        setDataQueue(data);
+      });
+
+      // check on going progress (if any)
+      socket.emit('get:process', { clientId });
+      socket.on('process:list', (data) => {
+        setDataQueue(data);
+        // console.log(data);
+      });
+    });
+
+    return () => {
+      socket.off('process:start');
+      socket.off('process:update');
+      socket.off('process:done');
+      socket.off('process:list');
+    };
+  }, [socket, clientId]);
 
   return (
     <div className='relative w-full'>
@@ -15,19 +52,22 @@ const Topbar = () => {
           <Card
             variant='surface'
             className={`w-52 py-[8px] duration-700  ${
-              status === 'idle'
-                ? 'translate-x-[120%] ease-[cubic-bezier(1,-0.49,.65,.85)]'
-                : 'cursor-pointer ease-[cubic-bezier(.18,.12,0,1.47)]'
+              dataQueue.progress >= 0
+                ? 'cursor-pointer ease-[cubic-bezier(.18,.12,0,1.47)]'
+                : 'translate-x-[120%] ease-[cubic-bezier(1,-0.49,.65,.85)]'
             }`}
             size='1'
-            onClick={() => setStatus('idle')}
           >
             <Flex align='center' justify='between' width='100%' gapX='1'>
               <Text weight='medium' className='truncate'>
                 {dataQueue.itemLabel}
               </Text>
               <div className='w-6 flex-shrink-0'>
-                <CircularProgress progress={progress > 100 ? 100 : progress} size={24} stroke={3} />
+                <CircularProgress
+                  progress={dataQueue.progress >= 100 ? 100 : dataQueue.progress}
+                  size={24}
+                  stroke={3}
+                />
               </div>
             </Flex>
           </Card>

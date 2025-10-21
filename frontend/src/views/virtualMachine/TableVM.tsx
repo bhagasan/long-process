@@ -1,11 +1,10 @@
 'use client';
-import { useSocket } from '@/components/context/SocketProvider';
 import { TrashIcon } from '@radix-ui/react-icons';
 import { Badge, IconButton, Skeleton, Table } from '@radix-ui/themes';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 const TableVM = () => {
-  const { progress, status } = useSocket();
+  // const { progress, status } = useSocket();
   return (
     <Table.Root variant='surface' mt='4'>
       <Table.Header>
@@ -19,7 +18,7 @@ const TableVM = () => {
       </Table.Header>
 
       <Table.Body>
-        {status === 'running' && (
+        {/* {status === 'running' && (
           <Table.Row>
             <Table.RowHeaderCell>
               <Skeleton height='28px' width='160px' />
@@ -37,7 +36,7 @@ const TableVM = () => {
               <Skeleton height='28px' width='32px' />
             </Table.Cell>
           </Table.Row>
-        )}
+        )} */}
         <Table.Row>
           <Table.RowHeaderCell>VirtualMachine-01</Table.RowHeaderCell>
           <Table.Cell>

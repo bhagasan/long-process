@@ -1,10 +1,40 @@
 'use client';
+import { useSocket } from '@/components/context/SocketProvider';
 import { TrashIcon } from '@radix-ui/react-icons';
 import { Badge, IconButton, Skeleton, Table } from '@radix-ui/themes';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 const TableVM = () => {
-  // const { progress, status } = useSocket();
+  const [dataQueue, setDataQueue] = useState<any>({});
+  const { socket, clientId } = useSocket();
+  useEffect(() => {
+    socket.on('connect', () => {
+      socket.on('process:start', (data) => {
+        setDataQueue(data);
+      });
+
+      socket.on('process:update', (data) => {
+        setDataQueue(data);
+      });
+
+      socket.on('process:done', (data) => {
+        setDataQueue(data);
+      });
+
+      // check on going progress (if any)
+      socket.emit('get:process', { clientId });
+      socket.on('process:list', (data) => {
+        setDataQueue(data);
+      });
+    });
+
+    return () => {
+      socket.off('process:start');
+      socket.off('process:update');
+      socket.off('process:done');
+      socket.off('process:list');
+    };
+  }, [socket, clientId]);
   return (
     <Table.Root variant='surface' mt='4'>
       <Table.Header>
@@ -18,7 +48,7 @@ const TableVM = () => {
       </Table.Header>
 
       <Table.Body>
-        {/* {status === 'running' && (
+        {dataQueue.progress >= 0 && dataQueue.progress < 100 && (
           <Table.Row>
             <Table.RowHeaderCell>
               <Skeleton height='28px' width='160px' />
@@ -36,7 +66,7 @@ const TableVM = () => {
               <Skeleton height='28px' width='32px' />
             </Table.Cell>
           </Table.Row>
-        )} */}
+        )}
         <Table.Row>
           <Table.RowHeaderCell>VirtualMachine-01</Table.RowHeaderCell>
           <Table.Cell>

@@ -18,28 +18,28 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [progress, setProgress] = useState<number>(0);
   const [dataQueue, setDataQueue] = useState<any>({});
   const [status, setStatus] = useState('idle');
-  const email = 'admin@admin.com';
+  const clientId = 'admin@admin.com';
 
   // generate or reuse a client ID
-  const clientId = useMemo(() => {
-    if (typeof window !== 'undefined') {
-      let id = localStorage.getItem('clientId');
-      if (!id) {
-        // id = crypto.randomUUID();
-        id = email;
-        localStorage.setItem('clientId', id);
-      }
-      return id;
-    }
-    return null;
-  }, []);
+  // const clientId = useMemo(() => {
+  //   if (typeof window !== 'undefined') {
+  //     let id = localStorage.getItem('clientId');
+  //     if (!id) {
+  //       // id = crypto.randomUUID();
+  //       id = email;
+  //       localStorage.setItem('clientId', id);
+  //     }
+  //     return id;
+  //   }
+  //   return null;
+  // }, []);
 
   const socket = useMemo(
     () =>
       io('http://localhost:4000', {
         transports: ['websocket'],
         autoConnect: false,
-        query: { email },
+        query: { clientId },
       }),
     [],
   );
@@ -76,15 +76,20 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
 
     // check on going progress (if any)
-    socket.emit('getProgress', clientId);
+    socket.emit('get:process', { clientId });
+    socket.on('process:list', (data) => {
+      setDataQueue(data);
+      console.log(data);
+    });
 
     return () => {
       socket.disconnect();
       socket.off('process:start');
       socket.off('process:update');
       socket.off('process:done');
+      socket.off('process:list');
     };
-  }, [socket, clientId]);
+  }, [socket]);
 
   return (
     <SocketContext.Provider value={{ socket, progress, status, setProgress, setStatus, dataQueue, setDataQueue }}>

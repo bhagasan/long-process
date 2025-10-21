@@ -11,18 +11,6 @@ const io = new Server(server, {
 });
 let userSockets = {};
 
-/*
-  userSocket = {
-    [clientId]: {
-      [actionId]: {
-        actionType: ...,
-        progress: ...
-      }
-    }
-  }
-
-*/
-
 app.use(express.json());
 
 app.post('/vm-create', (req, res) => {
@@ -35,17 +23,9 @@ app.post('/vm-create', (req, res) => {
 
   const interval = setInterval(() => {
     progress += 10;
-    userSockets = {
-      ...userSockets,
-      [clientId]: {
-        ...userSockets[clientId],
-        [actionId]: {
-          ...userSockets[clientId]?.[actionId],
-          progress,
-          actionType,
-          itemLabel,
-        },
-      },
+    userSockets[clientId] = {
+      ...userSockets[clientId],
+      [actionId]: { progress, actionType, itemLabel },
     };
 
     io.to(clientId).emit('process:update', { progress, actionType, actionId, itemLabel });
@@ -67,16 +47,21 @@ app.post('/vm-create', (req, res) => {
 
 // 🔹 Socket.io connection handler
 io.on('connection', (socket) => {
-  const email = socket.handshake.query.email;
-  socket.join(email);
-  if (email) {
-    userSockets[email] = {};
-    console.log(`✅ Connected: ${email} (${socket.id})`);
+  const clientId = socket.handshake.query.clientId;
+  socket.join(clientId);
+  if (clientId) {
+    if (!userSockets[clientId]) {
+      userSockets[clientId] = {};
+      console.log(`✅ Connected (new): ${clientId} (${socket.id})`);
+    } else {
+      console.log(`♻️ Reconnected: ${clientId} (${socket.id})`);
+    }
   }
 
-  socket.on('register', (clientId) => {
-    socket.join(clientId);
-    console.log(`Client registered: ${clientId}`);
+  socket.on('get:process', ({ clientId }) => {
+    const data = userSockets[clientId];
+    console.log('get:process ->', clientId, data);
+    socket.emit('process:list', data);
   });
 
   socket.on('getProgress', (clientId, actionId) => {

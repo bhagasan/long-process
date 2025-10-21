@@ -6,7 +6,7 @@ import { BellIcon } from '@radix-ui/react-icons';
 import { Card, Flex, IconButton, Text } from '@radix-ui/themes';
 
 const Topbar = () => {
-  const { progress, status, setStatus } = useSocket();
+  const { progress, status, setStatus, dataQueue } = useSocket();
 
   return (
     <div className='relative w-full'>
@@ -24,7 +24,7 @@ const Topbar = () => {
           >
             <Flex align='center' justify='between' width='100%' gapX='1'>
               <Text weight='medium' className='truncate'>
-                VirtualMachine-03
+                {dataQueue.itemLabel}
               </Text>
               <div className='w-6 flex-shrink-0'>
                 <CircularProgress progress={progress > 100 ? 100 : progress} size={24} stroke={3} />

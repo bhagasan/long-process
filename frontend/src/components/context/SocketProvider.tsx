@@ -6,15 +6,19 @@ type SocketContextValue = {
   socket: Socket;
   progress: number;
   status: string;
+  dataQueue: any;
   setStatus: React.Dispatch<React.SetStateAction<string>>;
   setProgress: React.Dispatch<React.SetStateAction<number>>;
+  setDataQueue: React.Dispatch<React.SetStateAction<any>>;
 };
 
 const SocketContext = createContext<SocketContextValue | null>(null);
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [progress, setProgress] = useState<number>(0);
+  const [dataQueue, setDataQueue] = useState<any>({});
   const [status, setStatus] = useState('idle');
+  const email = 'admin@admin.com';
 
   // generate or reuse a client ID
   const clientId = useMemo(() => {
@@ -22,7 +26,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       let id = localStorage.getItem('clientId');
       if (!id) {
         // id = crypto.randomUUID();
-        id = 'admin@admin.com';
+        id = email;
         localStorage.setItem('clientId', id);
       }
       return id;
@@ -35,53 +39,55 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       io('http://localhost:4000', {
         transports: ['websocket'],
         autoConnect: false,
+        query: { email },
       }),
     [],
   );
 
   useEffect(() => {
-    socket.connect();
+    if (!socket.connected) socket.connect();
 
-    socket.emit('register', clientId);
+    // socket.emit('register', clientId);
 
     socket.on('connect', () => console.log('✅ Connected'));
     socket.on('disconnect', () => console.log('❌ Disconnected'));
 
     socket.on('process:start', (data) => {
+      const { progress, actionType, actionId, itemLabel } = data;
+      console.log('start', { actionId, actionType, progress, itemLabel });
       setStatus('running');
+      setDataQueue(data);
       setProgress(data?.progress ?? 0);
     });
 
     socket.on('process:update', (data) => {
+      const { progress, actionType, actionId, itemLabel } = data;
+      console.log('update', { actionId, actionType, progress, itemLabel });
+      setDataQueue(data);
       setProgress(data.progress);
     });
 
-    socket.on('process:done', () => {
+    socket.on('process:done', (data) => {
+      const { actionType, actionId, message, itemLabel } = data;
+      console.log('done', { actionId, actionType, itemLabel, message });
       setStatus('done');
+      setDataQueue(data);
       setProgress(100);
     });
 
+    // check on going progress (if any)
     socket.emit('getProgress', clientId);
 
     return () => {
       socket.disconnect();
+      socket.off('process:start');
+      socket.off('process:update');
+      socket.off('process:done');
     };
   }, [socket, clientId]);
 
-  // useEffect(() => {
-  //   socket.on('process:start', () => setStatus('running'));
-  //   socket.on('process:update', (data) => setProgress(data.progress));
-  //   socket.on('process:done', () => setStatus('done'));
-
-  //   return () => {
-  //     socket.off('process:start');
-  //     socket.off('process:update');
-  //     socket.off('process:done');
-  //   };
-  // }, [setProgress, socket, status]);
-
   return (
-    <SocketContext.Provider value={{ socket, progress, status, setProgress, setStatus }}>
+    <SocketContext.Provider value={{ socket, progress, status, setProgress, setStatus, dataQueue, setDataQueue }}>
       {children}
     </SocketContext.Provider>
   );

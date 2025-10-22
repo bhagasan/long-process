@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang='en'>
       <body className={inter.className}>
         <SocketProvider>
-          <Theme accentColor='purple' grayColor='sand' radius='large'>
+          <Theme accentColor='blue' grayColor='sand' radius='large'>
             <BaseLayout sidebar={<Sidebar />} topbar={<Topbar />}>
               {children}
             </BaseLayout>

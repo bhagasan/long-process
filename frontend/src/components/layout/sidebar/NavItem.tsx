@@ -16,7 +16,9 @@ export default function NavItem({ label, href }: Props) {
     <Link
       href={href}
       className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm ${
-        active ? 'bg-gray-100 font-medium' : 'hover:bg-gray-50'
+        active
+          ? 'bg-[var(--accent-9)] hover:bg-[var(--accent-11)] text-[var(--accent-contrast)] font-medium'
+          : 'hover:bg-gray-50'
       }`}
     >
       {label}

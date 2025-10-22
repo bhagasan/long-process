@@ -1,12 +1,15 @@
 'use client';
 import { useSocket } from '@/components/context/SocketProvider';
+import { StatusColorTypes, VMStatusTypes } from '@/utils/types';
 import { TrashIcon } from '@radix-ui/react-icons';
 import { Badge, IconButton, Skeleton, Table } from '@radix-ui/themes';
 import React, { useEffect, useState } from 'react';
 
-const TableVM = () => {
+const TableVM = ({ data }: { data: any[] }) => {
   const [dataQueue, setDataQueue] = useState<any>({});
   const { socket, clientId } = useSocket();
+
+  console.log({ data });
   useEffect(() => {
     socket.on('connect', () => {
       socket.on('process:start', (data) => {
@@ -55,6 +58,20 @@ const TableVM = () => {
     };
   }, [socket, clientId]);
 
+  const renderBadge = (status: VMStatusTypes) => {
+    let color: StatusColorTypes = 'green';
+    switch (status) {
+      case 'Stopped':
+        color = 'orange';
+        break;
+      case 'Crashed':
+        color = 'red';
+        break;
+    }
+
+    return <Badge color={color}>{status}</Badge>;
+  };
+
   return (
     <Table.Root variant='surface' mt='4'>
       <Table.Header>
@@ -87,33 +104,20 @@ const TableVM = () => {
             </Table.Cell>
           </Table.Row>
         ))}
-        <Table.Row>
-          <Table.RowHeaderCell>VirtualMachine-01</Table.RowHeaderCell>
-          <Table.Cell>
-            <Badge color='green'>Running</Badge>
-          </Table.Cell>
-          <Table.Cell>vps-medium-m1</Table.Cell>
-          <Table.Cell>130.59.192.10</Table.Cell>
-          <Table.Cell width='60px'>
-            <IconButton variant='soft' color='red'>
-              <TrashIcon />
-            </IconButton>
-          </Table.Cell>
-        </Table.Row>
 
-        <Table.Row>
-          <Table.RowHeaderCell>VirtualMachine-02</Table.RowHeaderCell>
-          <Table.Cell>
-            <Badge color='green'>Running</Badge>
-          </Table.Cell>
-          <Table.Cell>vps-small-m1</Table.Cell>
-          <Table.Cell>130.59.192.10</Table.Cell>
-          <Table.Cell width='60px'>
-            <IconButton variant='soft' color='red'>
-              <TrashIcon />
-            </IconButton>
-          </Table.Cell>
-        </Table.Row>
+        {data.map((d: any) => (
+          <Table.Row key={d.id}>
+            <Table.RowHeaderCell>{d.name}</Table.RowHeaderCell>
+            <Table.Cell>{renderBadge(d.status)}</Table.Cell>
+            <Table.Cell>vps-medium-m1</Table.Cell>
+            <Table.Cell>{d.ip}</Table.Cell>
+            <Table.Cell width='60px'>
+              <IconButton variant='soft' color='red'>
+                <TrashIcon />
+              </IconButton>
+            </Table.Cell>
+          </Table.Row>
+        ))}
       </Table.Body>
     </Table.Root>
   );

@@ -1,12 +1,31 @@
 'use client';
 
-import { Box, Flex, Progress, Text } from '@radix-ui/themes';
+import { Box, Flex, Skeleton, Text } from '@radix-ui/themes';
 import ModalCreate from '@/views/virtualMachine/ModalCreate';
 import TableVM from '@/views/virtualMachine/TableVM';
 import { useEffect, useState } from 'react';
-import { useSocket } from '@/components/context/SocketProvider';
 
 export default function VirtualMachinePage() {
+  const [data, setData] = useState<any[]>([]); // holds your mock VMs
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchVMs() {
+      try {
+        const res = await fetch('http://localhost:4000/mock/vm');
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const json = await res.json();
+        setData(json); // assign data here
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchVMs();
+  }, []);
   return (
     <main>
       <Flex direction='column' gap='4'>
@@ -17,13 +36,9 @@ export default function VirtualMachinePage() {
           <ModalCreate />
         </Flex>
         <Box>
-          {/* <button onClick={startProcess} disabled={status === 'running'}>
-            {status === 'running' ? 'Processing...' : 'Start Process'}
-          </button>
-          <Progress value={progress} size='1' />
-          <p>Status: {status}</p>
-          <p>Progress: {progress}%</p> */}
-          <TableVM />
+          <Skeleton loading={loading}>
+            <TableVM data={data} />
+          </Skeleton>
         </Box>
       </Flex>
     </main>

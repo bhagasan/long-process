@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const { getMockVMList, getMockStorageList, getMockNetworkList } = require('./mock/mockService');
 const app = express();
 
 app.use(cors());
@@ -74,5 +75,9 @@ io.on('connection', (socket) => {
     }
   });
 });
+
+app.get('/mock/vm', (req, res) => res.json(getMockVMList()));
+app.get('/mock/storages', (req, res) => res.json(getMockStorageList()));
+app.get('/mock/networks', (req, res) => res.json(getMockNetworkList()));
 
 server.listen(4000, () => console.log('✅ Backend running on http://localhost:4000'));

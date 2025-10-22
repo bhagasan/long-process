@@ -12,29 +12,41 @@ const Topbar = () => {
   useEffect(() => {
     socket.on('connect', () => {
       socket.on('process:start', (data) => {
-        // const { progress, actionType, actionId, itemLabel } = data;
-        // console.log('start', { actionId, actionType, progress, itemLabel });
-        setDataQueue(data);
+        setDataQueue((prev: any) => ({
+          ...prev,
+          [data.actionId]: {
+            progress: data.progress,
+            actionType: data.actionType,
+            itemLabel: data.itemLabel,
+          },
+        }));
       });
 
       socket.on('process:update', (data) => {
-        // const { progress, actionType, actionId, itemLabel } = data;
-        // console.log('update', { actionId, actionType, progress, itemLabel });
-        setDataQueue(data);
+        setDataQueue((prev: any) => ({
+          ...prev,
+          [data.actionId]: {
+            progress: data.progress,
+            actionType: data.actionType,
+            itemLabel: data.itemLabel,
+          },
+        }));
       });
 
       socket.on('process:done', (data) => {
-        // const { actionType, actionId, message, itemLabel } = data;
-        // console.log('done', { actionId, actionType, itemLabel, message });
-        setDataQueue(data);
+        setDataQueue((prev: any) => ({
+          ...prev,
+          [data.actionId]: {
+            progress: data.progress,
+            actionType: data.actionType,
+            itemLabel: data.itemLabel,
+            done: true,
+          },
+        }));
       });
 
-      // check on going progress (if any)
       socket.emit('get:process', { clientId });
-      socket.on('process:list', (data) => {
-        setDataQueue(data);
-        // console.log(data);
-      });
+      socket.on('process:list', (data) => setDataQueue(data));
     });
 
     return () => {

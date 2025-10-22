@@ -10,22 +10,41 @@ const TableVM = () => {
   useEffect(() => {
     socket.on('connect', () => {
       socket.on('process:start', (data) => {
-        setDataQueue(data);
+        setDataQueue((prev: any) => ({
+          ...prev,
+          [data.actionId]: {
+            progress: data.progress,
+            actionType: data.actionType,
+            itemLabel: data.itemLabel,
+          },
+        }));
       });
 
       socket.on('process:update', (data) => {
-        setDataQueue(data);
+        setDataQueue((prev: any) => ({
+          ...prev,
+          [data.actionId]: {
+            progress: data.progress,
+            actionType: data.actionType,
+            itemLabel: data.itemLabel,
+          },
+        }));
       });
 
       socket.on('process:done', (data) => {
-        setDataQueue(data);
+        setDataQueue((prev: any) => ({
+          ...prev,
+          [data.actionId]: {
+            progress: data.progress,
+            actionType: data.actionType,
+            itemLabel: data.itemLabel,
+            done: true,
+          },
+        }));
       });
 
-      // check on going progress (if any)
       socket.emit('get:process', { clientId });
-      socket.on('process:list', (data) => {
-        setDataQueue(data);
-      });
+      socket.on('process:list', (data) => setDataQueue(data));
     });
 
     return () => {

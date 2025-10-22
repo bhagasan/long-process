@@ -60,7 +60,6 @@ io.on('connection', (socket) => {
 
   socket.on('get:process', ({ clientId }) => {
     const data = userSockets[clientId];
-    console.log('get:process ->', clientId, data);
     socket.emit('process:list', data);
   });
 

@@ -80,6 +80,15 @@ io.on('connection', (socket) => {
     socket.emit('process:list', data);
   });
 
+  socket.on('queue:dismiss', ({ clientId, actionId }) => {
+    const { [actionId]: _, ...other } = userSockets[clientId];
+    socket.emit('process:list', other);
+    userSockets = {
+      ...userSockets,
+      [clientId]: other,
+    };
+  });
+
   // socket.on('getProgress', (clientId, actionId) => {
   //   const progress = userSockets[clientId][actionId]?.progress || 0;
   //   console.log(`Sending last progress for ${clientId}:`, progress);

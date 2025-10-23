@@ -50,11 +50,15 @@ const Topbar = () => {
     return Object.keys(dataQueue).length;
   };
 
+  const handleDismiss = (actionId: string) => {
+    socket.emit('queue:dismiss', { clientId, actionId });
+  };
+
   const renderIslands = () => {
     const elms: any[] = [];
-    Object.entries(dataQueue).forEach(([clientId], idx: number) => {
+    Object.entries(dataQueue).forEach(([actionId], idx: number) => {
       const upper = idx < Object.keys(dataQueue).length - 1;
-      const { itemLabel, progress } = dataQueue[clientId];
+      const { itemLabel, progress } = dataQueue[actionId];
 
       elms.push(
         <div
@@ -93,7 +97,7 @@ const Topbar = () => {
               {progress >= 100 && (
                 <Cross2Icon
                   className='absolute w-6 top-1/2 -translate-y-1/2 right-3 z-10 group-hover/card:opacity-100 opacity-0 group-hover/card:pointer-events-auto pointer-events-none cursor-pointer duration-500'
-                  onClick={() => console.log('close')}
+                  onClick={() => handleDismiss(actionId)}
                 />
               )}
             </Flex>

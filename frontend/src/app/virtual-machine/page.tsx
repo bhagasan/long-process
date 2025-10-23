@@ -3,29 +3,50 @@
 import { Box, Flex, Skeleton, Text } from '@radix-ui/themes';
 import ModalCreate from '@/views/virtualMachine/ModalCreate';
 import TableVM from '@/views/virtualMachine/TableVM';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { fetchVMs } from '@/store/actions/vmActions';
+import { useSocket } from '@/components/context/SocketProvider';
+
+type LoadTypes = {
+  setData: Dispatch<SetStateAction<any[]>>;
+  setError: Dispatch<SetStateAction<string | null>>;
+  setLoading: Dispatch<SetStateAction<boolean>>;
+};
 
 export default function VirtualMachinePage() {
   const [data, setData] = useState<any[]>([]); // holds your mock VMs
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchVMs() {
-      try {
-        const res = await fetch('http://localhost:4000/mock/vm');
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        const json = await res.json();
-        setData(json); // assign data here
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+  const loadVMs = async ({ setData, setError, setLoading }: LoadTypes) => {
+    try {
+      const json = await fetchVMs();
+      setData(json);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    fetchVMs();
+  useEffect(() => {
+    loadVMs({ setData, setError, setLoading });
   }, []);
+
+  const { socket } = useSocket();
+  useEffect(() => {
+    socket.on('connect', () => {
+      socket.on('process:done', (data) => {
+        console.log('dataDone', data);
+        loadVMs({ setData, setError, setLoading });
+      });
+    });
+
+    return () => {
+      socket.off('process:done');
+    };
+  }, [socket]);
+
   return (
     <main>
       <Flex direction='column' gap='4'>

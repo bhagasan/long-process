@@ -30,7 +30,7 @@ const CircularProgress = ({ progress = 75, size = 100, stroke = 8 }) => {
           r={radius}
           cx={size / 2}
           cy={size / 2}
-          className='transition-all duration-500 ease-out'
+          className='transition-all duration-1000 ease-out'
         />
       </svg>
       {/* overlay the text without rotation */}

@@ -1,4 +1,5 @@
 const express = require('express');
+const { faker } = require('@faker-js/faker');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
@@ -11,11 +12,12 @@ const io = new Server(server, {
   cors: { origin: 'http://localhost:3000', methods: ['GET', 'POST'] },
 });
 let userSockets = {};
+let initDataVM = getMockVMList();
 
 app.use(express.json());
 
 app.post('/vm-create', (req, res) => {
-  const { clientId, actionType, actionId, itemLabel } = req.body;
+  const { clientId, actionType, actionId, itemLabel, hostname, ip, location } = req.body;
   if (!clientId) return res.status(400).json({ error: 'Missing clientId' });
 
   // let progress = clientProgress[actionId] || 0;
@@ -40,8 +42,18 @@ app.post('/vm-create', (req, res) => {
         itemLabel,
         message: 'Process completed!',
       });
+      const temp = {
+        id: faker.string.uuid(),
+        name: hostname,
+        status: 'Running',
+        ip: ip,
+        region: location,
+        createdAt: faker.date.recent(),
+      };
+
+      initDataVM = [temp, ...initDataVM];
     }
-  }, 3000);
+  }, 1000);
 
   res.json({ status: 'started', clientId });
 });
@@ -76,7 +88,7 @@ io.on('connection', (socket) => {
   });
 });
 
-app.get('/mock/vm', (req, res) => res.json(getMockVMList()));
+app.get('/mock/vm', (req, res) => res.json(initDataVM));
 app.get('/mock/storages', (req, res) => res.json(getMockStorageList()));
 app.get('/mock/networks', (req, res) => res.json(getMockNetworkList()));
 

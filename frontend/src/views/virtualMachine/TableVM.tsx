@@ -6,48 +6,59 @@ import { Badge, IconButton, Skeleton, Table } from '@radix-ui/themes';
 import React, { useEffect, useState } from 'react';
 
 const TableVM = ({ data }: { data: any[] }) => {
-  const [dataQueue, setDataQueue] = useState<any>({});
   const { socket, clientId } = useSocket();
+  const [processLength, setProcessLength] = useState<number>(0);
 
   console.log({ data });
   useEffect(() => {
     socket.on('connect', () => {
       socket.on('process:start', (data) => {
-        setDataQueue((prev: any) => ({
-          ...prev,
-          [data.actionId]: {
-            progress: data.progress,
-            actionType: data.actionType,
-            itemLabel: data.itemLabel,
-          },
-        }));
+        socket.emit('get:process', { clientId });
+        console.log({ data });
+        // setDataQueue((prev: any) => ({
+        //   ...prev,
+        //   [data.actionId]: {
+        //     progress: data.progress,
+        //     actionType: data.actionType,
+        //     itemLabel: data.itemLabel,
+        //   },
+        // }));
       });
 
       socket.on('process:update', (data) => {
-        setDataQueue((prev: any) => ({
-          ...prev,
-          [data.actionId]: {
-            progress: data.progress,
-            actionType: data.actionType,
-            itemLabel: data.itemLabel,
-          },
-        }));
+        socket.emit('get:process', { clientId });
+        console.log({ data });
+        // setDataQueue((prev: any) => ({
+        //   ...prev,
+        //   [data.actionId]: {
+        //     progress: data.progress,
+        //     actionType: data.actionType,
+        //     itemLabel: data.itemLabel,
+        //   },
+        // }));
       });
 
       socket.on('process:done', (data) => {
-        setDataQueue((prev: any) => ({
-          ...prev,
-          [data.actionId]: {
-            progress: data.progress,
-            actionType: data.actionType,
-            itemLabel: data.itemLabel,
-            done: true,
-          },
-        }));
+        socket.emit('get:process', { clientId });
+        console.log({ data });
+        // setDataQueue((prev: any) => ({
+        //   ...prev,
+        //   [data.actionId]: {
+        //     progress: data.progress,
+        //     actionType: data.actionType,
+        //     itemLabel: data.itemLabel,
+        //     done: true,
+        //   },
+        // }));
       });
 
       socket.emit('get:process', { clientId });
-      socket.on('process:list', (data) => setDataQueue(data));
+      socket.on('process:list', (data) => {
+        const running = Object.values(data).filter((d: any) => d.progress !== 100);
+        setProcessLength(running.length);
+        // const running = Object.entries(data).find(([clientId]) => data[clientId].progress !== 100);
+        // setProcessLength(Object.keys(data).length)
+      });
     });
 
     return () => {
@@ -85,7 +96,7 @@ const TableVM = ({ data }: { data: any[] }) => {
       </Table.Header>
 
       <Table.Body>
-        {Object.entries(dataQueue).map((_, idx: number) => (
+        {Array.from({ length: processLength }, (_, idx) => (
           <Table.Row key={`skeleton-${idx}`}>
             <Table.RowHeaderCell>
               <Skeleton height='28px' width='160px' />

@@ -12,7 +12,7 @@ const BaseLayout = ({ sidebar, children, topbar }: Props) => {
       <div className='w-64 flex-shrink-0 p-4'>{sidebar}</div>
       <div className='relative w-full'>
         {topbar}
-        <div className='px-4 pt-6'>{children}</div>
+        <div className='px-4 pt-6 relative'>{children}</div>
       </div>
     </div>
   );

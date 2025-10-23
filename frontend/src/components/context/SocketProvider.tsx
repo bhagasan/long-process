@@ -26,6 +26,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     socket.on('connect', () => console.log('✅ Connected'));
     socket.on('disconnect', () => console.log('❌ Disconnected'));
+    socket.emit('get:process', { clientId });
 
     return () => {
       socket.disconnect();

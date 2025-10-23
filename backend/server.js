@@ -19,10 +19,14 @@ app.use(express.json());
 app.post('/vm-create', (req, res) => {
   const { clientId, actionType, actionId, itemLabel, hostname, ip, location } = req.body;
   if (!clientId) return res.status(400).json({ error: 'Missing clientId' });
-
-  // let progress = clientProgress[actionId] || 0;
   let progress = 0;
+
+  userSockets[clientId] = {
+    ...userSockets[clientId],
+    [actionId]: { progress, actionType, itemLabel },
+  };
   io.to(clientId).emit('process:start', { progress, actionType, actionId, itemLabel });
+  io.to(clientId).emit('process:list', userSockets[clientId]);
 
   const interval = setInterval(() => {
     progress += 10;
@@ -52,9 +56,9 @@ app.post('/vm-create', (req, res) => {
       };
 
       initDataVM = [temp, ...initDataVM];
+      io.to(clientId).emit('process:list', userSockets[clientId]);
     }
-  }, 1000);
-
+  }, 3000);
   res.json({ status: 'started', clientId });
 });
 
@@ -76,16 +80,16 @@ io.on('connection', (socket) => {
     socket.emit('process:list', data);
   });
 
-  socket.on('getProgress', (clientId, actionId) => {
-    const progress = userSockets[clientId][actionId]?.progress || 0;
-    console.log(`Sending last progress for ${clientId}:`, progress);
+  // socket.on('getProgress', (clientId, actionId) => {
+  //   const progress = userSockets[clientId][actionId]?.progress || 0;
+  //   console.log(`Sending last progress for ${clientId}:`, progress);
 
-    if (progress > 0 && progress < 100) {
-      socket.emit('process:start', { progress, actionId });
-    } else if (progress >= 100) {
-      socket.emit('process:done', { actionId, message: 'Process completed!' });
-    }
-  });
+  //   if (progress > 0 && progress < 100) {
+  //     socket.emit('process:start', { progress, actionId });
+  //   } else if (progress >= 100) {
+  //     socket.emit('process:done', { actionId, message: 'Process completed!' });
+  //   }
+  // });
 });
 
 app.get('/mock/vm', (req, res) => res.json(initDataVM));

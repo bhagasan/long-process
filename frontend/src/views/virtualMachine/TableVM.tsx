@@ -9,62 +9,15 @@ const TableVM = ({ data }: { data: any[] }) => {
   const { socket, clientId } = useSocket();
   const [processLength, setProcessLength] = useState<number>(0);
 
-  console.log({ data });
   useEffect(() => {
     socket.on('connect', () => {
-      socket.on('process:start', (data) => {
-        socket.emit('get:process', { clientId });
-        console.log({ data });
-        // setDataQueue((prev: any) => ({
-        //   ...prev,
-        //   [data.actionId]: {
-        //     progress: data.progress,
-        //     actionType: data.actionType,
-        //     itemLabel: data.itemLabel,
-        //   },
-        // }));
-      });
-
-      socket.on('process:update', (data) => {
-        socket.emit('get:process', { clientId });
-        console.log({ data });
-        // setDataQueue((prev: any) => ({
-        //   ...prev,
-        //   [data.actionId]: {
-        //     progress: data.progress,
-        //     actionType: data.actionType,
-        //     itemLabel: data.itemLabel,
-        //   },
-        // }));
-      });
-
-      socket.on('process:done', (data) => {
-        socket.emit('get:process', { clientId });
-        console.log({ data });
-        // setDataQueue((prev: any) => ({
-        //   ...prev,
-        //   [data.actionId]: {
-        //     progress: data.progress,
-        //     actionType: data.actionType,
-        //     itemLabel: data.itemLabel,
-        //     done: true,
-        //   },
-        // }));
-      });
-
-      socket.emit('get:process', { clientId });
       socket.on('process:list', (data) => {
         const running = Object.values(data).filter((d: any) => d.progress !== 100);
         setProcessLength(running.length);
-        // const running = Object.entries(data).find(([clientId]) => data[clientId].progress !== 100);
-        // setProcessLength(Object.keys(data).length)
       });
     });
 
     return () => {
-      socket.off('process:start');
-      socket.off('process:update');
-      socket.off('process:done');
       socket.off('process:list');
     };
   }, [socket, clientId]);

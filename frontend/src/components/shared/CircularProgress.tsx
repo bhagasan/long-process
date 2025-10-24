@@ -21,7 +21,7 @@ const CircularProgress = ({ progress = 75, size = 100, stroke = 8 }) => {
           cy={size / 2}
         />
         <circle
-          stroke='#8e4ec6' // blue-500
+          stroke='#0d74ce' // blue-500
           fill='transparent'
           strokeWidth={stroke}
           strokeLinecap='round'

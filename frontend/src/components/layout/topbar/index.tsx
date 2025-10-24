@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSocket } from '@/components/context/SocketProvider';
 import CircularProgress from '@/components/shared/CircularProgress';
-import { BellIcon, CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
+import { PersonIcon, CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
 import { Card, Flex, IconButton, Text } from '@radix-ui/themes';
 
 const Topbar = () => {
@@ -52,12 +52,20 @@ const Topbar = () => {
 
   const handleDismiss = (actionId: string) => {
     socket.emit('queue:dismiss', { clientId, actionId });
+    if (!cardContainerRef.current) return;
+    // cardContainerRef.current.style.height = `${dataQueueLength() * 46}px`;
+    // let temp = itemRefs.current.length - 1;
+    let temp = itemRefs.current.length - 1;
+    for (let idx: number = 0; idx < itemRefs.current.length; idx++) {
+      temp--;
+      itemRefs.current[idx].style.setProperty('transform', `translate3d(-50%, ${temp * 44}px,0)`);
+    }
   };
 
   const renderIslands = () => {
     const elms: any[] = [];
     Object.entries(dataQueue).forEach(([actionId], idx: number) => {
-      const upper = idx < Object.keys(dataQueue).length - 1;
+      const backwards = idx < Object.keys(dataQueue).length - 1;
       const { itemLabel, progress } = dataQueue[actionId];
 
       elms.push(
@@ -67,14 +75,16 @@ const Topbar = () => {
             if (el) itemRefs.current[idx] = el;
           }}
           className={`absolute top-0 left-1/2 -translate-x-1/2 cursor-default ${
-            upper
+            backwards
               ? `scale-[0.85] mt-2 opacity-35 group-hover/root:mt-0 group-hover/root:opacity-100 group-hover/root:scale-100 duration-200`
               : ''
           }`}
         >
           <Card
             variant='surface'
-            className={`w-52 py-[8px] duration-200 group/card ${upper ? 'bg-[#afafaf] group-hover/root:bg-white' : ''}`}
+            className={`w-52 py-[8px] duration-200 group/card ${
+              backwards ? 'bg-[#afafaf] group-hover/root:bg-white' : ''
+            }`}
             size='1'
           >
             <Flex align='center' justify='between' width='100%' gapX='1'>
@@ -112,7 +122,7 @@ const Topbar = () => {
     if (!cardContainerRef.current) return;
     cardContainerRef.current.style.height = `${dataQueueLength() * 46}px`;
     let temp = itemRefs.current.length;
-    for (let idx: number = 0; idx < temp; idx++) {
+    for (let idx: number = 0; idx < itemRefs.current.length; idx++) {
       temp--;
       itemRefs.current[idx].style.setProperty('transform', `translate3d(-50%, ${temp * 44}px,0)`);
     }
@@ -122,7 +132,7 @@ const Topbar = () => {
     if (!cardContainerRef.current) return;
     cardContainerRef.current.style.height = '0px';
     const temp = itemRefs.current.length - 1;
-    for (let idx: number = 0; idx < temp; idx++) {
+    for (let idx: number = 0; idx < itemRefs.current.length - 1; idx++) {
       const isLast = idx === temp;
       itemRefs.current[idx].style.setProperty('transform', `translate3d(-50%, 0px,0px) ${!isLast && 'scale(0.85)'}`);
     }
@@ -140,7 +150,7 @@ const Topbar = () => {
           {renderIslands()}
         </div>
         <IconButton size='3' variant='outline' radius='full' color='gray' className='relative bg-white'>
-          <BellIcon />
+          <PersonIcon />
         </IconButton>
       </div>
     </div>

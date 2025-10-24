@@ -33,19 +33,27 @@ export default function VirtualMachinePage() {
     loadVMs({ setData, setError, setLoading });
   }, []);
 
-  const { socket } = useSocket();
+  const { socket, clientId } = useSocket();
   useEffect(() => {
-    socket.on('connect', () => {
-      socket.on('process:done', (data) => {
-        console.log('dataDone', data);
-        loadVMs({ setData, setError, setLoading });
-      });
-    });
+    const handleProcessDone = (data: any) => {
+      console.log('dataDone', data);
+      loadVMs({ setData, setError, setLoading });
+    };
+
+    socket.on('process:done', handleProcessDone);
+
+    const handleConnect = () => {
+      console.log('Reconnected, refreshing data...');
+      socket.emit('get:process', { clientId });
+    };
+
+    socket.on('connect', handleConnect);
 
     return () => {
-      socket.off('process:done');
+      socket.off('process:done', handleProcessDone);
+      socket.off('connect', handleConnect);
     };
-  }, [socket]);
+  }, [socket, clientId]);
 
   return (
     <main>

@@ -24,15 +24,20 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     if (!socket.connected) socket.connect();
 
-    socket.on('connect', () => console.log('✅ Connected'));
-    socket.on('disconnect', () => console.log('❌ Disconnected'));
-    socket.emit('get:process', { clientId });
+    const handleConnect = () => {
+      console.log('✅ Connected');
+      socket.emit('get:process', { clientId });
+    };
+    const handleDisconnect = () => console.log('❌ Disconnected');
+
+    socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
 
     return () => {
-      socket.disconnect();
-      socket.off('connect');
+      socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
     };
-  }, [socket]);
+  }, [socket, clientId]);
 
   return <SocketContext.Provider value={{ socket, clientId }}>{children}</SocketContext.Provider>;
 };

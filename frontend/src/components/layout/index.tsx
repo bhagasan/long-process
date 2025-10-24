@@ -8,7 +8,7 @@ type Props = {
 
 const BaseLayout = ({ sidebar, children, topbar }: Props) => {
   return (
-    <div className='flex w-full min-h-screen relative'>
+    <div className='flex w-full min-h-screen relative bg-[#f5f6fa]'>
       <div className='w-64 flex-shrink-0 p-4'>{sidebar}</div>
       <div className='relative w-full'>
         {topbar}

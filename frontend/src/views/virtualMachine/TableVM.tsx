@@ -10,15 +10,16 @@ const TableVM = ({ data }: { data: any[] }) => {
   const [processLength, setProcessLength] = useState<number>(0);
 
   useEffect(() => {
-    socket.on('connect', () => {
-      socket.on('process:list', (data) => {
-        const running = Object.values(data).filter((d: any) => d.progress !== 100);
-        setProcessLength(running.length);
-      });
-    });
+    const handleProcessList = (data: any) => {
+      const running = Object.values(data).filter((d: any) => d.progress !== 100);
+      setProcessLength(running.length);
+    };
+
+    socket.on('process:list', handleProcessList);
+    socket.emit('get:process', { clientId });
 
     return () => {
-      socket.off('process:list');
+      socket.off('process:list', handleProcessList);
     };
   }, [socket, clientId]);
 
